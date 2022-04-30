@@ -49,7 +49,6 @@ def addRestaurant():
     jsonData = request.get_json()
     name = jsonData['name']
     category = jsonData['category']
-
     conn = sqlite3.connect('fff.db')
     cursor = conn.cursor()
     print(name, flush=True)
@@ -57,6 +56,22 @@ def addRestaurant():
     command = """INSERT INTO restaurants VALUES
     (?, ?)"""
     cursor.execute(command, (name, category))
+    conn.commit()
+    conn.close()
+    return "Done!"
+
+@app.route("/updateMenuItem", methods = ['POST'])
+def updateMenu():
+    jsonData = request.get_json()
+    restaurant = jsonData['restaurant']
+    name = jsonData['name']
+    price = jsonData['price']
+    calories = jsonData['calories']
+    conn = sqlite3.connect('fff.db')
+    cursor = conn.cursor()
+    command = """UPDATE Menu SET price = (?), calories = (?) WHERE restaurant_id = (?)
+        AND name = (?)"""
+    cursor.execute(command, (price, calories, restaurant, name))
     conn.commit()
     conn.close()
     return "Done!"

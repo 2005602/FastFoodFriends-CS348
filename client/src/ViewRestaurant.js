@@ -7,6 +7,9 @@ function ViewRestaurant() {
     const [newCalories, setNewCalories] = useState("");
     const [minCalories, setMinCalories] = useState("");
     const [maxCalories, setMaxCalories] = useState("");
+    const [editFoodName, setEditFoodName] = useState("");
+    const [editPrice, setEditPrice] = useState("");
+    const [editCalories, setEditCalories] = useState("");
 
     const params = new URLSearchParams(window.location.search);
     let restaurant = params.get('place');
@@ -50,6 +53,19 @@ function ViewRestaurant() {
         window.location.reload(false);
     }
 
+    function editMenuItem() {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ "restaurant": restaurant, "name": editFoodName, 
+                "price": parseFloat(editPrice), "calories": parseInt(editCalories)})
+        };
+        console.log(requestOptions)
+        fetch("/updateMenuItem", requestOptions);
+        window.location.reload(false);
+    }
+
+
     function filterCals() {
         const requestOptions = {
             method: 'POST',
@@ -71,7 +87,20 @@ function ViewRestaurant() {
     return (
         <div>
             <h1>{restaurant}</h1>
-            <h4>Menu:</h4>
+            <h2>Menu:</h2>
+            {renderMenu()}
+            <h4>Update Food Item</h4>
+            <label>
+                Food Name:
+                <input value={editFoodName} onChange={e => setEditFoodName(e.target.value)}/>
+                Price:
+                <input value={editPrice} onChange={e => setEditPrice(e.target.value)}/>
+                Calories:
+                <input value={editCalories} onChange={e => setEditCalories(e.target.value)}/>
+            </label>
+            <button onClick={() => editMenuItem()}>Update</button>
+            <h4>Filter Food Item</h4>
+            <br/>
             <label>
                 Min Calories:
                 <input value={minCalories} onChange={e => setMinCalories(e.target.value)}/>
@@ -79,7 +108,7 @@ function ViewRestaurant() {
                 <input value={maxCalories} onChange={e => setMaxCalories(e.target.value)}/>
                 <button type="button" onClick={() => filterCals()}>Filter</button>
             </label>
-            {renderMenu()}
+            <h4>Create Food Item</h4>
             <br/>
             <label>
                 Food Name:
