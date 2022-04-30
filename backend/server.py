@@ -73,6 +73,7 @@ def addMenuItem():
     command = """INSERT INTO Menu VALUES
     (?, ?, ?, ?)"""
     cursor.execute(command, (restaurant, name, price, calories))
+    conn.commit()
     conn.close()
     return {"status": "Done"}
 
@@ -81,16 +82,6 @@ def addUser():
     jsonData = request.get_json()
     email = jsonData['email']
     password = jsonData['password']
-
-    # conn = sqlite3.connect('fff.db')
-    # cursor = conn.cursor()
-    # print(email, flush=True)
-    # print(password, flush=True)
-    # command = """INSERT INTO users VALUES
-    # (?, ?)"""
-    # cursor.execute(command, (email, password))
-    # conn.commit()
-    # conn.close()
 
     db = SqliteDatabase('fff.db')
 
@@ -157,6 +148,17 @@ def getRestaurants():
     conn.close()
     print(result, flush=True)
     return {"restaurants": result}
+
+@app.route("/allMenu")
+def getAllMenu():
+    conn = sqlite3.connect('fff.db')
+    cursor = conn.cursor()
+    command = """SELECT * FROM menu"""
+    cursor.execute(command)
+    result = cursor.fetchall()
+    conn.close()
+    print(result, flush=True)
+    return {"menu": result}
 
 @app.route("/users")
 def getUsers():

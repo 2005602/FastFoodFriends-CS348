@@ -43,6 +43,7 @@ function ViewRestaurant() {
             body: JSON.stringify({ "restaurant": restaurant, "name": newFoodName, 
                 "price": parseFloat(newPrice), "calories": parseInt(newCalories)})
         };
+        console.log(requestOptions)
         fetch("/addMenuItem", requestOptions);
         window.location.reload(false);
     }
