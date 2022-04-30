@@ -23,6 +23,8 @@ def setup():
     command = """DROP TABLE IF EXISTS
     users"""
     cursor.execute(command)
+    command = """CREATE INDEX calories ON Menu(calories ASC)"""
+    cursor.execute(command)
     # command = """CREATE TABLE IF NOT EXISTS
     # users(email TEXT PRIMARY KEY, password TEXT)"""
     # cursor.execute(command)
