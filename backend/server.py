@@ -1,5 +1,6 @@
 import sqlite3
 from flask import Flask, request
+from peewee import SqliteDatabase, Model, TextField, DateField, IntegerField
 
 app = Flask(__name__)
 
@@ -22,11 +23,25 @@ def setup():
     command = """DROP TABLE IF EXISTS
     users"""
     cursor.execute(command)
-    command = """CREATE TABLE IF NOT EXISTS
-    users(email TEXT PRIMARY KEY, password TEXT)"""
-    cursor.execute(command)
-
+    # command = """CREATE TABLE IF NOT EXISTS
+    # users(email TEXT PRIMARY KEY, password TEXT)"""
+    # cursor.execute(command)
     conn.close()
+
+    db = SqliteDatabase('fff.db')
+
+    class BaseTable(Model):
+        class Meta:
+            database = db
+
+    class Users(BaseTable):
+        email = TextField(null=False, index=True)
+        password = TextField(null=False, index=True)
+
+    db.connect()
+    db.create_tables([Users])
+    db.close()
+
     return "Done!"
 
 @app.route("/addRestaurant", methods = ['POST'])
@@ -58,21 +73,39 @@ def addMenuItem():
     command = """INSERT INTO Menu VALUES
     (?, ?, ?, ?)"""
     cursor.execute(command, (restaurant, name, price, calories))
+    conn.close()
+    return {"status": "Done"}
 
 @app.route("/addUser", methods = ['POST'])
 def addUser():
     jsonData = request.get_json()
     email = jsonData['email']
     password = jsonData['password']
-    conn = sqlite3.connect('fff.db')
-    cursor = conn.cursor()
-    print(email, flush=True)
-    print(password, flush=True)
-    command = """INSERT INTO users VALUES
-    (?, ?)"""
-    cursor.execute(command, (email, password))
-    conn.commit()
-    conn.close()
+
+    # conn = sqlite3.connect('fff.db')
+    # cursor = conn.cursor()
+    # print(email, flush=True)
+    # print(password, flush=True)
+    # command = """INSERT INTO users VALUES
+    # (?, ?)"""
+    # cursor.execute(command, (email, password))
+    # conn.commit()
+    # conn.close()
+
+    db = SqliteDatabase('fff.db')
+
+    class BaseTable(Model):
+        class Meta:
+            database = db
+
+    class Users(BaseTable):
+        email = TextField(null=False, index=True)
+        password = TextField(null=False, index=True)
+
+    db.connect()
+    Users.create(email=email, password=password)
+    db.close()
+
     return {"status": "Done"}
 
 @app.route("/MenuItem", methods = ['POST'])
