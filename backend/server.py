@@ -103,11 +103,25 @@ def addUser():
 def getMenu():
     jsonData = request.get_json()
     restaurant = jsonData['restaurant']
-    print(restaurant)
     conn = sqlite3.connect('fff.db')
     cursor = conn.cursor()
     command = """SELECT * FROM Menu WHERE restaurant_id = (?)"""
     cursor.execute(command, (restaurant,))
+    result = cursor.fetchall()
+    conn.close()
+    print(result, flush=True)
+    return {"menu": result}
+
+@app.route("/menuCals", methods = ['POST'])
+def getMenuCals():
+    jsonData = request.get_json()
+    restaurant = jsonData['restaurant']
+    minCals = jsonData['minCals']
+    maxCals = jsonData['maxCals']
+    conn = sqlite3.connect('fff.db')
+    cursor = conn.cursor()
+    command = """SELECT * FROM Menu WHERE restaurant_id = (?) AND  calories BETWEEN (?) AND (?)"""
+    cursor.execute(command, (restaurant, minCals, maxCals))
     result = cursor.fetchall()
     conn.close()
     print(result, flush=True)
