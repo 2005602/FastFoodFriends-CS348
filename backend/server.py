@@ -1,6 +1,6 @@
 import sqlite3
 from flask import Flask, request
-from peewee import SqliteDatabase, Model, TextField, DateField, IntegerField
+from peewee import SqliteDatabase, Model, TextField
 
 app = Flask(__name__)
 
@@ -13,6 +13,8 @@ def setup():
     cursor.execute(command)
     command = """CREATE TABLE IF NOT EXISTS
     restaurants(restaurant_id TEXT PRIMARY KEY, category TEXT)"""
+    cursor.execute(command)
+    command = """CREATE INDEX category_asc ON restaurants(category ASC)"""
     cursor.execute(command)
     command = """DROP TABLE IF EXISTS
     Menu"""
