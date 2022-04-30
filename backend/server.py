@@ -146,6 +146,26 @@ def checkUser():
         return "true"
 
     return "false"
+
+@app.route("/searchCategory", methods = ['POST'])
+def searchCategory():
+    jsonData = request.get_json()
+    search = jsonData['search']
+
+    conn = sqlite3.connect('fff.db')
+    cursor = conn.cursor()
+    print(search, flush=True)
+    command = """
+        SELECT *
+        FROM restaurants
+        WHERE category = (?)  
+        """
+    cursor.execute(command, (search,))
+
+    result = cursor.fetchall()
+    print(result, flush=True)
+    conn.close()
+    return {"restaurants": result}
     
 @app.route("/restaurants")
 def getRestaurants():
