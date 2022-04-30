@@ -58,6 +58,8 @@ def addMenuItem():
     command = """INSERT INTO Menu VALUES
     (?, ?, ?, ?)"""
     cursor.execute(command, (restaurant, name, price, calories))
+    conn.close()
+    return {"status": "Done"}
 
 @app.route("/addUser", methods = ['POST'])
 def addUser():
