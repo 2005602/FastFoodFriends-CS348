@@ -18,18 +18,18 @@ function Restaurants() {
     }, []); 
 
     function addRestaurant() {
-    const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ "name": newRestaurant, "category": newCategory})
-    };
-    fetch("/addRestaurant", requestOptions);
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ "name": newRestaurant, "category": newCategory})
+        };
+        fetch("/addRestaurant", requestOptions);
     }
 
     function renderRestaurants() {
         let items = []
         restaurants.forEach((res, index) => {
-            items.push(<div><a href="restaurant">{res[0]}, {res[1]}</a></div>)
+            items.push(<div><a href={`/ViewRestaurant?place=${res[0]}`}>{res[0]}, {res[1]}</a></div>)
         })
         return items
     }
