@@ -1,19 +1,32 @@
 import React, {useState} from 'react';
+import { useHistory } from "react-router-dom";
 
 function Login() {
+    let history = useHistory();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     function addUser() {
-    const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            "email": email,
-            "password": password
-        })
-    };
-    fetch("/addUser", requestOptions);
+        console.log("testing");
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                "email": email,
+                "password": password
+            })
+        };
+        fetch("/addUser", requestOptions).then(
+            res => res.json()
+        ).then(
+            data => {
+                console.log(data)
+                if (data.status == "Done") {
+                    alert("Account successfully created")
+                }
+            }
+        )
     }
 
     function checkUser() {
@@ -31,6 +44,12 @@ function Login() {
     ).then(
         data => {
             console.log(data)
+            if (data == true) {
+                localStorage.setItem("user", email);
+                history.push("/Home");
+            } else {
+                alert("Invalid Login")
+            }
         }
     )
     }
@@ -40,9 +59,9 @@ function Login() {
         <form>
         <label>
             Email:
-            <input value="email" placeholder="email" value={email} onChange={e => setEmail(e.target.value)}/>
+            <input placeholder="email" value={email} onChange={e => setEmail(e.target.value)}/>
             Password:
-            <input value="password" placeholder="password" value={password} onChange={e => setPassword(e.target.value)}/>
+            <input placeholder="password" value={password} onChange={e => setPassword(e.target.value)}/>
         </label>
         <button type="button" onClick={() => addUser()}>Sign Up</button>
         <button type="button" onClick={() => checkUser()}>Login</button>

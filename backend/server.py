@@ -58,12 +58,12 @@ def addMenuItem():
     command = """INSERT INTO Menu VALUES
     (?, ?, ?, ?)"""
     cursor.execute(command, (restaurant, name, price, calories))
+
 @app.route("/addUser", methods = ['POST'])
 def addUser():
     jsonData = request.get_json()
     email = jsonData['email']
     password = jsonData['password']
-
     conn = sqlite3.connect('fff.db')
     cursor = conn.cursor()
     print(email, flush=True)
@@ -73,7 +73,7 @@ def addUser():
     cursor.execute(command, (email, password))
     conn.commit()
     conn.close()
-    return "Done!"
+    return {"status": "Done"}
 
 @app.route("/MenuItem", methods = ['POST'])
 def getMenu():
@@ -88,6 +88,7 @@ def getMenu():
     conn.close()
     print(result, flush=True)
     return {"menu": result}
+
 @app.route("/checkUser", methods = ['POST'])
 def checkUser():
     jsonData = request.get_json()
@@ -134,7 +135,6 @@ def getUsers():
     conn.close()
     print(result, flush=True)
     return {"users": result}
-
 
 if __name__ == "__main__":
     app.run(debug=True)
