@@ -51,7 +51,6 @@ def addRestaurant():
     jsonData = request.get_json()
     name = jsonData['name']
     category = jsonData['category']
-
     conn = sqlite3.connect('fff.db')
     cursor = conn.cursor()
     print(name, flush=True)
@@ -59,6 +58,22 @@ def addRestaurant():
     command = """INSERT INTO restaurants VALUES
     (?, ?)"""
     cursor.execute(command, (name, category))
+    conn.commit()
+    conn.close()
+    return "Done!"
+
+@app.route("/updateMenuItem", methods = ['POST'])
+def updateMenu():
+    jsonData = request.get_json()
+    restaurant = jsonData['restaurant']
+    name = jsonData['name']
+    price = jsonData['price']
+    calories = jsonData['calories']
+    conn = sqlite3.connect('fff.db')
+    cursor = conn.cursor()
+    command = """UPDATE Menu SET price = (?), calories = (?) WHERE restaurant_id = (?)
+        AND name = (?)"""
+    cursor.execute(command, (price, calories, restaurant, name))
     conn.commit()
     conn.close()
     return "Done!"
@@ -75,6 +90,7 @@ def addMenuItem():
     command = """INSERT INTO Menu VALUES
     (?, ?, ?, ?)"""
     cursor.execute(command, (restaurant, name, price, calories))
+    conn.commit()
     conn.close()
     return {"status": "Done"}
 
@@ -83,16 +99,6 @@ def addUser():
     jsonData = request.get_json()
     email = jsonData['email']
     password = jsonData['password']
-
-    # conn = sqlite3.connect('fff.db')
-    # cursor = conn.cursor()
-    # print(email, flush=True)
-    # print(password, flush=True)
-    # command = """INSERT INTO users VALUES
-    # (?, ?)"""
-    # cursor.execute(command, (email, password))
-    # conn.commit()
-    # conn.close()
 
     db = SqliteDatabase('fff.db')
 
@@ -114,7 +120,6 @@ def addUser():
 def getMenu():
     jsonData = request.get_json()
     restaurant = jsonData['restaurant']
-    print(restaurant)
     conn = sqlite3.connect('fff.db')
     cursor = conn.cursor()
     command = """SELECT * FROM Menu WHERE restaurant_id = (?)"""
@@ -123,6 +128,36 @@ def getMenu():
     conn.close()
     print(result, flush=True)
     return {"menu": result}
+
+@app.route("/menuCals", methods = ['POST'])
+def getMenuCals():
+    jsonData = request.get_json()
+    restaurant = jsonData['restaurant']
+    minCals = jsonData['minCals']
+    maxCals = jsonData['maxCals']
+    conn = sqlite3.connect('fff.db')
+    cursor = conn.cursor()
+    command = """SELECT * FROM Menu WHERE restaurant_id = (?) AND  calories BETWEEN (?) AND (?)"""
+    cursor.execute(command, (restaurant, minCals, maxCals))
+    result = cursor.fetchall()
+    conn.close()
+    print(result, flush=True)
+    return {"menu": result}
+
+@app.route("/deleteRes", methods = ['POST'])
+def deleteRes():
+    jsonData = request.get_json()
+    restaurant = jsonData['restaurant']
+    conn = sqlite3.connect('fff.db')
+    cursor = conn.cursor()
+    command = """DELETE FROM restaurants WHERE restaurant_id = (?)"""
+    cursor.execute(command, (restaurant,))
+    conn.commit()
+    command = """DELETE FROM menu WHERE restaurant_id = (?)"""
+    cursor.execute(command, (restaurant,))
+    conn.commit()
+    conn.close()
+    return {"status": "Done"}
 
 @app.route("/checkUser", methods = ['POST'])
 def checkUser():
@@ -179,6 +214,17 @@ def getRestaurants():
     conn.close()
     print(result, flush=True)
     return {"restaurants": result}
+
+@app.route("/allMenu")
+def getAllMenu():
+    conn = sqlite3.connect('fff.db')
+    cursor = conn.cursor()
+    command = """SELECT * FROM menu"""
+    cursor.execute(command)
+    result = cursor.fetchall()
+    conn.close()
+    print(result, flush=True)
+    return {"menu": result}
 
 @app.route("/users")
 def getUsers():
