@@ -127,6 +127,21 @@ def getMenuCals():
     print(result, flush=True)
     return {"menu": result}
 
+@app.route("/deleteRes", methods = ['POST'])
+def deleteRes():
+    jsonData = request.get_json()
+    restaurant = jsonData['restaurant']
+    conn = sqlite3.connect('fff.db')
+    cursor = conn.cursor()
+    command = """DELETE FROM restaurants WHERE restaurant_id = (?)"""
+    cursor.execute(command, (restaurant,))
+    conn.commit()
+    command = """DELETE FROM menu WHERE restaurant_id = (?)"""
+    cursor.execute(command, (restaurant,))
+    conn.commit()
+    conn.close()
+    return {"status": "Done"}
+
 @app.route("/checkUser", methods = ['POST'])
 def checkUser():
     jsonData = request.get_json()
