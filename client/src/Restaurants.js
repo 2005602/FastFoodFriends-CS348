@@ -18,7 +18,7 @@ function Restaurants() {
         }
     )
 
-    }, []); 
+    }, []);
 
     function addRestaurant() {
         const requestOptions = {
@@ -72,6 +72,7 @@ function Restaurants() {
 
     return (
     <div>
+        <button onClick={() => window.location.href = "http://localhost:3000"}>Logout</button>
         <form>
         <label>
             Restaurant:

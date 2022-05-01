@@ -10,10 +10,13 @@ function ViewRestaurant() {
     const [editFoodName, setEditFoodName] = useState("");
     const [editPrice, setEditPrice] = useState("");
     const [editCalories, setEditCalories] = useState("");
+    const [locs, setLocs] = useState([]);
+    const [newState, setNewState] = useState("");
+    const [newCity, setNewCity] = useState("");
 
     const params = new URLSearchParams(window.location.search);
     let restaurant = params.get('place');
-     
+
 
     useEffect(() => {
         console.log(restaurant);
@@ -29,23 +32,58 @@ function ViewRestaurant() {
                 setMenu(data.menu)
                 console.log(data.menu)
             }
-        )
-        
+        );
+        fetch("/ResLocation", requestOptions).then(
+            res => res.json()
+        ).then(
+            data => {
+                setLocs(data.locs)
+                console.log(data.locs)
+            }
+        );
         }, []);
-    
+
     function renderMenu() {
         let items = []
         menu.forEach((res, index) => {
             items.push(<div><p>Item: {res[1]}, Price: {res[2]}, Calories: {res[3]}</p></div>)
         })
         return items
-    }    
-    
+    }
+
+    function renderLocation() {
+        return locs?.map(loc => (<div><p>State: {loc[0]}, City: {loc[1]}</p></div>))
+    }
+
+    function addLocation() {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ "restaurant": restaurant, "state": newState,
+                "city": newCity})
+        };
+        console.log(requestOptions)
+        fetch("/addLocation", requestOptions);
+        window.location.reload(false);
+    }
+
+    function deleteLocation() {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ "restaurant": restaurant, "state": newState,
+                "city": newCity})
+        };
+        console.log(requestOptions)
+        fetch("/deleteLocation", requestOptions);
+        window.location.reload(false);
+    }
+
     function addMenuItem() {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ "restaurant": restaurant, "name": newFoodName, 
+            body: JSON.stringify({ "restaurant": restaurant, "name": newFoodName,
                 "price": parseFloat(newPrice), "calories": parseInt(newCalories)})
         };
         console.log(requestOptions)
@@ -57,7 +95,7 @@ function ViewRestaurant() {
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ "restaurant": restaurant, "name": editFoodName, 
+            body: JSON.stringify({ "restaurant": restaurant, "name": editFoodName,
                 "price": parseFloat(editPrice), "calories": parseInt(editCalories)})
         };
         console.log(requestOptions)
@@ -87,6 +125,7 @@ function ViewRestaurant() {
     return (
         <div>
             <h1>{restaurant}</h1>
+            <button onClick={() => window.location.href = "http://localhost:3000/Home"}>Back</button>
             <h2>Menu:</h2>
             {renderMenu()}
             <h4>Update Food Item</h4>
@@ -119,6 +158,18 @@ function ViewRestaurant() {
                 <input value={newCalories} onChange={e => setNewCalories(e.target.value)}/>
             </label>
             <button onClick={() => addMenuItem()}>Add</button>
+            <h2>Restaurant Locations:</h2>
+            {renderLocation()}
+            <h4>Add/Remove Restaurant Location</h4>
+            <br/>
+            <label>
+                State:
+                <input value={newState} onChange={e => setNewState(e.target.value)}/>
+                City:
+                <input value={newCity} onChange={e => setNewCity(e.target.value)}/>
+            </label>
+            <button onClick={() => addLocation()}>Add</button>
+            <button onClick={() => deleteLocation()}>Delete</button>
         </div>
 
 

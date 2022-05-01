@@ -22,10 +22,16 @@ def setup():
     command = """CREATE TABLE IF NOT EXISTS
     Menu(restaurant_id TEXT , name TEXT, price DOUBLE, calories INTEGER, PRIMARY KEY(restaurant_id,name))"""
     cursor.execute(command)
+    command = """CREATE INDEX calories ON Menu(calories ASC)"""
+    cursor.execute(command)
+    command = """DROP TABLE IF EXISTS
+    location"""
+    cursor.execute(command)
+    command = """CREATE TABLE IF NOT EXISTS
+    location(state TEXT, city TEXT, restaurant_id TEXT, PRIMARY KEY(state, city, restaurant_id))"""
+    cursor.execute(command)
     command = """DROP TABLE IF EXISTS
     users"""
-    cursor.execute(command)
-    command = """CREATE INDEX calories ON Menu(calories ASC)"""
     cursor.execute(command)
     # command = """CREATE TABLE IF NOT EXISTS
     # users(email TEXT PRIMARY KEY, password TEXT)"""
@@ -158,6 +164,9 @@ def deleteRes():
     command = """DELETE FROM menu WHERE restaurant_id = (?)"""
     cursor.execute(command, (restaurant,))
     conn.commit()
+    command = """DELETE FROM location WHERE restaurant_id = (?)"""
+    cursor.execute(command, (restaurant,))
+    conn.commit()
     conn.close()
     return {"status": "Done"}
 
@@ -174,7 +183,7 @@ def checkUser():
     command = """
         SELECT email, password
         FROM users
-        WHERE email = (?) AND password = (?)        
+        WHERE email = (?) AND password = (?)
         """
     cursor.execute(command, (email, password))
 
@@ -197,7 +206,7 @@ def searchCategory():
     command = """
         SELECT *
         FROM restaurants
-        WHERE category = (?)  
+        WHERE category = (?)
         """
     cursor.execute(command, (search,))
 
@@ -205,7 +214,7 @@ def searchCategory():
     print(result, flush=True)
     conn.close()
     return {"restaurants": result}
-    
+
 @app.route("/restaurants")
 def getRestaurants():
     conn = sqlite3.connect('fff.db')
@@ -238,6 +247,48 @@ def getUsers():
     conn.close()
     print(result, flush=True)
     return {"users": result}
+
+@app.route("/addLocation", methods = ['POST'])
+def addLocation():
+    jsonData = request.get_json()
+    state = jsonData['state']
+    city = jsonData['city']
+    restaurant = jsonData['restaurant']
+    conn = sqlite3.connect('fff.db')
+    cursor = conn.cursor()
+    command = """INSERT INTO location VALUES
+    (?, ?, ?)"""
+    cursor.execute(command, (state, city, restaurant))
+    conn.commit()
+    conn.close()
+    return {"status": "Done"}
+
+@app.route("/deleteLocation", methods = ['POST'])
+def deleteLocation():
+    jsonData = request.get_json()
+    state = jsonData['state']
+    city = jsonData['city']
+    restaurant = jsonData['restaurant']
+    conn = sqlite3.connect('fff.db')
+    cursor = conn.cursor()
+    command = """DELETE FROM location WHERE state = (?) AND city = (?) AND restaurant_id = (?)"""
+    cursor.execute(command, (state, city, restaurant,))
+    conn.commit()
+    conn.close()
+    return {"status": "Done"}
+
+@app.route("/ResLocation", methods = ['POST'])
+def getLocation():
+    jsonData = request.get_json()
+    restaurant = jsonData['restaurant']
+    conn = sqlite3.connect('fff.db')
+    cursor = conn.cursor()
+    command = """SELECT * FROM location WHERE restaurant_id = (?)"""
+    cursor.execute(command, (restaurant,))
+    result = cursor.fetchall()
+    conn.close()
+    print(result, flush=True)
+    return {"locs": result}
 
 if __name__ == "__main__":
     app.run(debug=True)
