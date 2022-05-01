@@ -290,5 +290,25 @@ def getLocation():
     print(result, flush=True)
     return {"locs": result}
 
+@app.route("/filterStateLoc", methods = ['POST'])
+def filterStateLoc():
+    jsonData = request.get_json()
+    restaurant = jsonData['restaurant']
+    state = jsonData['state']
+    conn = sqlite3.connect('fff.db')
+    cursor = conn.cursor()
+    print(restaurant, flush=True)
+    print(state, flush=True)
+    command = """
+        SELECT *
+        FROM location
+        WHERE restaurant_id = (?) AND state = (?)
+        """
+    cursor.execute(command, (restaurant, state,))
+    result = cursor.fetchall()
+    print(result, flush=True)
+    conn.close()
+    return {"locs": result}
+
 if __name__ == "__main__":
     app.run(debug=True)

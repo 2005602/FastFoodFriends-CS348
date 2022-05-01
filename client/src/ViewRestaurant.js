@@ -13,6 +13,7 @@ function ViewRestaurant() {
     const [locs, setLocs] = useState([]);
     const [newState, setNewState] = useState("");
     const [newCity, setNewCity] = useState("");
+    const [fState, setfState] = useState("");
 
     const params = new URLSearchParams(window.location.search);
     let restaurant = params.get('place');
@@ -122,6 +123,23 @@ function ViewRestaurant() {
         )
     }
 
+    function filterState() {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ "restaurant": restaurant,  "state": fState})
+        };
+        console.log(requestOptions)
+        fetch("/filterStateLoc", requestOptions).then(
+            res => res.json()
+        ).then(
+            data => {
+                setLocs(data.locs)
+                console.log(data.locs)
+            }
+        )
+    }
+
     return (
         <div>
             <h1>{restaurant}</h1>
@@ -170,6 +188,13 @@ function ViewRestaurant() {
             </label>
             <button onClick={() => addLocation()}>Add</button>
             <button onClick={() => deleteLocation()}>Delete</button>
+            <h4>Filter Restaurant Locations</h4>
+            <br/>
+            <label>
+                State:
+                <input value={fState} onChange={e => setfState(e.target.value)}/>
+                <button type="button" onClick={() => filterState()}>Filter</button>
+            </label>
         </div>
 
 
